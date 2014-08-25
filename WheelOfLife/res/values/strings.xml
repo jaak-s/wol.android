@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">WheelOfLife</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="button1">Start game!</string>
+    
+    <string name="menu_simple_ui">simple ui</string>
+    <string name="menu_wheel_of_life">wheel of life</string>
+    
+</resources>
