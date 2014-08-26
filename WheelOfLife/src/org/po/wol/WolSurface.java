@@ -27,7 +27,6 @@ public class WolSurface extends SurfaceView implements SurfaceHolder.Callback,
 									// will be of a class implementing
 									// SurfaceHolder
 	private WolThread surfaceThread;// The thread that displays the dots
-	private float mX, mY;
 
 	private SparseArray<PointF> mActivePointers;
 
@@ -86,7 +85,6 @@ public class WolSurface extends SurfaceView implements SurfaceHolder.Callback,
 			float width = surfaceThread.getmCanvasWidth();
 			if (isLeft(f.x, width)) {
 				if (inputState.right) {
-					surfaceThread.addDot();
 					inputState.up = true;
 				} else {
 					inputState.left = true;
@@ -94,7 +92,6 @@ public class WolSurface extends SurfaceView implements SurfaceHolder.Callback,
 			} else if (isRight(f.x, width)) {
 				// for fun and debugging:
 				if (inputState.left) {
-					surfaceThread.addDot();
 					inputState.up = true;
 				} else {
 					inputState.right = true;
