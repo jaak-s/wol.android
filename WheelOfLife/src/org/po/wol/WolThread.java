@@ -173,9 +173,9 @@ public class WolThread extends Thread {
 			paint.setStrokeWidth(0.1f);
 			paint.setStyle(Paint.Style.FILL);
 
-			canvas.drawArc(new RectF(ox, oy, ox+(r * 2), oy+(r * 2)), angle, 90.1f,
+			canvas.drawArc(new RectF(ox, oy, ox+(r * 2), oy+(r * 2)), angle, -90.1f,
 					true, paint);
-			angle += 90;
+			angle -= 90;
 		}
 	}
 
@@ -208,7 +208,7 @@ public class WolThread extends Thread {
 		float startAngle = worldToScreenAngle(line.a0);
 		RectF oval = new RectF(ox, oy, ox+(r * 2), oy+(r * 2));
 
-		canvas.drawArc(oval, startAngle, arc, false, paint);
+		canvas.drawArc(oval, startAngle, -arc, false, paint);
 	}
 
 	private void paintBloke(Canvas canvas) {
@@ -250,7 +250,7 @@ public class WolThread extends Thread {
 		if (out == null) {
 			out = new PointF();
 		}
-		double radianAngle = -a * Math.PI / 180d;
+		double radianAngle = a * Math.PI / 180d;
 		out.x = (float) (r * Math.cos(radianAngle));
 		out.y = (float) (r * Math.sin(radianAngle));
 
@@ -274,8 +274,8 @@ public class WolThread extends Thread {
 		return out;
 	}
 
-	private float worldToScreenAngle(float worldAngle) {
-		return worldAngle - state.c_a - 90;
+	float worldToScreenAngle(float worldAngle) {
+		return - worldAngle + state.c_a + 90;
 	}
 
 	// /////////// end of sverik's code
