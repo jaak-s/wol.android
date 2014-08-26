@@ -32,7 +32,7 @@ public class Logic {
 			new SeasonParams(3f, 1f, -0.30f, 10f) // autumn
 	};
 
-	private static final float FALL_ACCELERATION = 0.0125f;
+	private static final float FALL_ACCELERATION = 0.03f;
 	private static final float MAX_FALL_VELOCITY = 8f;
 	private static final float BLOKE_FROM_CAMERA_BOTTOM = 120;
 	private static final float TOUCHING_GROUND_THRESHOLD = 0.005f;
