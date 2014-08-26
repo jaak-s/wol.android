@@ -168,7 +168,7 @@ public class WolThread extends Thread {
 		float oy = -(r + state.c_r - height);
 		float angle = worldToScreenAngle(0);
 		for (int c : backgrounds) {
-			Paint paint = new Paint();
+			Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 			paint.setColor(c);
 			paint.setStrokeWidth(0.1f);
 			paint.setStyle(Paint.Style.FILL);
@@ -188,7 +188,7 @@ public class WolThread extends Thread {
 	private void paintLineWithArc(Canvas canvas, Line line, int color) {
 		float thickness = Math.abs(line.r1 - line.r0);
 
-		Paint paint = new Paint();
+		Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		paint.setStrokeWidth(thickness);
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setStrokeCap(Paint.Cap.BUTT);
@@ -214,7 +214,7 @@ public class WolThread extends Thread {
 	private void paintBloke(Canvas canvas) {
 		PointF s = polarToScreen(state.p_a, state.p_r - 3);
 
-		Paint paint = new Paint();
+		Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		paint.setStyle(Paint.Style.FILL);
 		paint.setColor(blokeColors[state.season.ordinal()]);
 
@@ -223,7 +223,7 @@ public class WolThread extends Thread {
 	}
 	
 	private void paintOverlay(Canvas canvas) {
-		Paint paint = new Paint();
+		Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		
 		if (previousSeason != state.season) {
 			seasonTextRemaining = SEASON_TEXT_DURATION;
