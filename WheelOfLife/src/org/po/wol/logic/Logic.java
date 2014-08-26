@@ -10,6 +10,7 @@ import org.po.wol.world.World;
 import android.graphics.PointF;
 
 public class Logic {
+
 	private static class SeasonParams {
 		public final float userAcceleration;
 		public final float frictionDeceleration;
@@ -26,17 +27,20 @@ public class Logic {
 	}
 
 	private static final SeasonParams[] params = {
-			new SeasonParams(0.6f, 0.4f, -0.30f, 10f), // winter
-			new SeasonParams(2.8f, 1.2f, -0.30f, 8f), // spring
-			new SeasonParams(3f, 1f, -0.32f, 12f), // summer
-			new SeasonParams(3f, 1f, -0.30f, 10f) // autumn
+		new SeasonParams(0.6f, 0.008f, -0.30f, 10f), // winter
+		new SeasonParams(2.8f, 0.024f, -0.30f,  8f), // spring
+		new SeasonParams(3f,   0.02f,   -0.32f, 12f), // summer
+		new SeasonParams(3f,   0.02f,   -0.30f, 10f)  // autumn
 	};
 
-	private static final float FALL_ACCELERATION = 0.03f;
+	private static final float FALL_ACCELERATION = 0.0006f;
 	private static final float MAX_FALL_VELOCITY = 8f;
 	private static final float BLOKE_FROM_CAMERA_BOTTOM = 120;
 	private static final float TOUCHING_GROUND_THRESHOLD = 0.005f;
-	private static final float AIR_CONTROL_MULTIPLIER = 0.3f;
+	private static final float AIR_CONTROL_MULTIPLIER = 0.006f;
+	private static final float LAND_CONTROL_MULTIPLIER = 0.02f;
+	private static final float CAMERA_ANGLE_APPROACH = 0.002f;
+	private static final float CAMERA_RADIUS_APPROACH = 0.002f;
 
 	private State state;
 	private World world;
@@ -75,7 +79,7 @@ public class Logic {
 		d.x = 0;
 		d.y = 0;
 
-		updateCamera();
+		updateCamera(delta);
 
 	}
 
@@ -90,7 +94,7 @@ public class Logic {
 	}
 
 	private void physics(long delta) {
-		state.p_rv += FALL_ACCELERATION;
+		state.p_rv += FALL_ACCELERATION * delta;
 		if (state.p_rv > MAX_FALL_VELOCITY) {
 			state.p_rv = MAX_FALL_VELOCITY;
 		}
@@ -98,7 +102,7 @@ public class Logic {
 
 		if (!jumping) {
 			state.p_lv -= Math.signum(state.p_lv)
-					* sParams.frictionDeceleration;
+					* sParams.frictionDeceleration * delta;
 		}
 		d.x = delta * state.p_lv / (state.p_r + d.y);
 	}
@@ -160,15 +164,15 @@ public class Logic {
 		return collisionFree;
 	}
 
-	private void updateCamera() {
+	private void updateCamera(long delta) {
 		float d_a = (state.p_a - state.c_a);
 		if (Math.abs(d_a) > 180) {
 			d_a -= Math.signum(d_a) * 360;
 		}
-		state.c_a += d_a * 0.1;
+		state.c_a += d_a * CAMERA_ANGLE_APPROACH * delta;
 
 		float d_r = (state.p_r + BLOKE_FROM_CAMERA_BOTTOM - state.c_r);
-		state.c_r += d_r * 0.1;
+		state.c_r += d_r * CAMERA_RADIUS_APPROACH * delta;
 
 		if (state.c_a >= 360) {
 			state.c_a -= 360;
@@ -189,7 +193,7 @@ public class Logic {
 			state.p_rv = sParams.jumpAcceleration;
 		}
 
-		float controlMultiplier = (jumping ? AIR_CONTROL_MULTIPLIER : 1f);
+		float controlMultiplier = (jumping ? AIR_CONTROL_MULTIPLIER : LAND_CONTROL_MULTIPLIER) * delta;
 		if (input.right) {
 			state.p_lv += sParams.userAcceleration * controlMultiplier;
 			if (state.p_lv > sParams.maxLinearVelocity) {
