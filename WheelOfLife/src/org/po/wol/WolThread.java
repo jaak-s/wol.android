@@ -114,6 +114,7 @@ public class WolThread extends Thread {
 			}
 
 			logic.step(delta);
+			logic.step(delta);
 
 			// PAINT
 			try {
