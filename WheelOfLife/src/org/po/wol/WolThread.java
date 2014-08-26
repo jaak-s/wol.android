@@ -25,7 +25,7 @@ public class WolThread extends Thread {
 	private SurfaceHolder holder;
 	private boolean running = false;
 	private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-	private final int refresh_rate = 10; // How often we update the screen, in
+	private final int refresh_rate = 20; // How often we update the screen, in
 											// ms
 
 	private World world;
