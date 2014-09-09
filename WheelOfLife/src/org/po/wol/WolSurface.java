@@ -14,11 +14,11 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
-// We extend SurfaceView. Internally (private) SurfaceView creates an object SurfaceHolder  
-// effectively defining the methods of the SurfaceHolder interface. Notice that it does  
-// not create a new class or anything, it just defines it right there. When we extend  
-// the SurfaceView with the SurfaceHolder.Callback interface, we need to add in that extension  
-// the methods of that interface.  
+// We extend SurfaceView. Internally (private) SurfaceView creates an object SurfaceHolder
+// effectively defining the methods of the SurfaceHolder interface. Notice that it does
+// not create a new class or anything, it just defines it right there. When we extend
+// the SurfaceView with the SurfaceHolder.Callback interface, we need to add in that extension
+// the methods of that interface.
 
 public class WolSurface extends SurfaceView implements SurfaceHolder.Callback,
 		OnTouchListener {
@@ -141,7 +141,7 @@ public class WolSurface extends SurfaceView implements SurfaceHolder.Callback,
 			int height) {
 		if (surfaceThread == null) {
 			surfaceThread = new WolThread(holder, world, state, inputState,
-					logic);
+					logic, getResources());
 			surfaceThread.setRunning(true);
 			surfaceThread.setSurfaceSize(width, height);
 			surfaceThread.start();

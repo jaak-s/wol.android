@@ -1,13 +1,18 @@
 package org.po.wol;
 
+import org.po.wheeloflife.R;
 import org.po.wol.logic.Logic;
 import org.po.wol.state.InputState;
 import org.po.wol.state.State.Season;
 import org.po.wol.world.Line;
 import org.po.wol.world.World;
 
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.PointF;
@@ -34,7 +39,7 @@ public class WolThread extends Thread {
 	private int width = 0;
 	private int height = 0;
 	private int w_2 = 0;
-	
+
 	private float blokeSize = 5;
 
 	//private long delta;
@@ -43,6 +48,9 @@ public class WolThread extends Thread {
 	private Season previousSeason = null;
 	private InputState inputState;
 	private Logic logic;
+	private Resources res;
+
+	private Bitmap testBgImage;
 
 	private static final int[] backgrounds = { Color.parseColor("#d3f8ff"),
 			Color.parseColor("#a8ff7d"), Color.parseColor("#ead957"),
@@ -53,12 +61,13 @@ public class WolThread extends Thread {
 			Color.parseColor("#833124"), };
 
 	public WolThread(SurfaceHolder holder, World world,
-			org.po.wol.state.State state, InputState inputState, Logic logic) {
+			org.po.wol.state.State state, InputState inputState, Logic logic, Resources res) {
 		this.holder = holder;
 		this.world = world;
 		this.state = state;
 		this.inputState = inputState;
 		this.logic = logic;
+		this.res = res;
 	}
 
 	@Override
@@ -66,11 +75,13 @@ public class WolThread extends Thread {
 		long previousTime, currentTime;
 		previousTime = System.currentTimeMillis();
 		Canvas canvas = null;
-		
+
 		long previous;
 		long start = System.currentTimeMillis();
 		long end = System.currentTimeMillis();
 		long delta = 0;
+
+		testBgImage = BitmapFactory.decodeResource(res, R.drawable.puu);
 
 		while (running) {
 			// Look if time has past
@@ -83,7 +94,7 @@ public class WolThread extends Thread {
 			start = System.currentTimeMillis();
 //			delta = start - previous;
 			delta = refresh_rate;
-			
+
 			// GAME
 			if (inputState.reloading) {
 				world.load();
@@ -113,7 +124,7 @@ public class WolThread extends Thread {
 			}
 		}
 	}
-	
+
 	private void draw(Canvas canvas) {
 		paintBackground(canvas);
 		paintWorld(canvas);
@@ -140,6 +151,21 @@ public class WolThread extends Thread {
 					true, paint);
 			angle -= 90;
 		}
+
+		final float t_a = 123;
+		final float t_sa = 5;
+		final float t_r = 1285;
+		final int t_w = 447;
+		final int t_h = 450;
+		final int t_w_2 = t_w / 2;
+		PointF t_s = polarToScreen(t_a, t_r);
+		Matrix tr = new Matrix();
+		tr.preRotate((state.c_a - t_a + t_sa), t_s.x, t_s.y);
+		t_s.x -= t_w_2;
+		t_s.y -= t_h;
+		tr.preTranslate(t_s.x, t_s.y);
+		tr.preScale((float)t_w / testBgImage.getWidth(), (float)t_h / testBgImage.getHeight());
+		canvas.drawBitmap(testBgImage, tr, null);
 	}
 
 	private void paintWorld(Canvas canvas) {
@@ -184,10 +210,10 @@ public class WolThread extends Thread {
 		RectF oval = new RectF(s.x - blokeSize, s.y - blokeSize, s.x + blokeSize*2, s.y + blokeSize*2);
 		canvas.drawOval(oval, paint);
 	}
-	
+
 	private void paintOverlay(Canvas canvas) {
 		Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		
+
 		if (previousSeason != state.season) {
 			seasonTextRemaining = SEASON_TEXT_DURATION;
 		}
@@ -199,7 +225,7 @@ public class WolThread extends Thread {
 			int c = Color.argb((int)Math.min(255, (float)255*seasonTextRemaining / SEASON_TEXT_FADE_START), 0, 0, 0);
 			paint.setColor(c);
 			paint.setTextAlign(Align.CENTER);
-			
+
 			canvas.drawText(state.season.toString(), width/2, 100, paint);
 		}
 	}
@@ -246,11 +272,11 @@ public class WolThread extends Thread {
 	public void setRunning(boolean b) {
 		running = b;
 	}
-	
+
 	public int getmCanvasHeight() {
 		return mCanvasHeight;
 	}
-	
+
 	public int getmCanvasWidth() {
 		return mCanvasWidth;
 	}
