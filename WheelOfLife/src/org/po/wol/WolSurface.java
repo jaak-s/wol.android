@@ -50,6 +50,8 @@ public class WolSurface extends SurfaceView implements SurfaceHolder.Callback,
 		world.load();
 		inputState = new InputState();
 		logic = new Logic(state, inputState, world);
+
+		setLayerType(View.LAYER_TYPE_HARDWARE, null);
 	}
 
 	private boolean isLeft(float x, float width) {

@@ -17,7 +17,7 @@ public class State {
 	/** Character's linear velocity */
 	public float p_lv = 0;
 
-	public Season season;
+	public Season season = Season.SPRING;
 
 	@Override
 	public String toString() {
