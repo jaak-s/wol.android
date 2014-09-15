@@ -6,6 +6,7 @@ import org.po.wol.state.State;
 import org.po.wol.world.World;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.util.SparseArray;
 import android.view.MotionEvent;
@@ -50,6 +51,9 @@ public class WolSurface extends SurfaceView implements SurfaceHolder.Callback,
 		world.load();
 		inputState = new InputState();
 		logic = new Logic(state, inputState, world);
+
+		surfaceThread = new WolThread(holder, world, state, inputState,
+				logic, getResources());
 
 		setLayerType(View.LAYER_TYPE_HARDWARE, null);
 	}
@@ -141,13 +145,10 @@ public class WolSurface extends SurfaceView implements SurfaceHolder.Callback,
 	// This is always called at least once, after surfaceCreated
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
-		if (surfaceThread == null) {
-			surfaceThread = new WolThread(holder, world, state, inputState,
-					logic, getResources());
-			surfaceThread.setRunning(true);
-			surfaceThread.setSurfaceSize(width, height);
-			surfaceThread.start();
-		}
+		surfaceThread.setHolder( holder );
+		surfaceThread.setRunning(true);
+		surfaceThread.setSurfaceSize(width, height);
+		surfaceThread.start();
 	}
 
 	@Override
@@ -165,5 +166,9 @@ public class WolSurface extends SurfaceView implements SurfaceHolder.Callback,
 
 	public Thread getThread() {
 		return surfaceThread;
+	}
+
+	public Bitmap getWorldAsBitmap(int size) {
+		return surfaceThread.getWorldAsBitmap(size);
 	}
 }

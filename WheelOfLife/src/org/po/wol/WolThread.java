@@ -18,6 +18,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
+import android.graphics.Paint.Style;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.util.Log;
@@ -134,13 +135,24 @@ public class WolThread extends Thread {
 
 	private FixedBitmap paintWorldToImage() {
 		int size = 512;
-		Bitmap bi = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+		Bitmap bm = getWorldAsBitmap( size );
 
-		Canvas canvas = new Canvas(bi);
+		return new FixedBitmap(0, size / 2, 0, bm, size, size);
+	}
+
+	public Bitmap getWorldAsBitmap(int size) {
+		Bitmap bm = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+
+		Canvas canvas = new Canvas(bm);
+		Paint paint = new Paint();
+		paint.setColor(Color.CYAN);
+		paint.setStyle(Style.FILL);
+		canvas.drawRect(0, 0, size, size, paint);
 
 		paintWorld(canvas, size, size, 0f, size / 2f, world.getLines());
 
-		return new FixedBitmap(0, size / 2, 0, bi, size, size);
+		return bm;
+
 	}
 
 	public void draw(Canvas canvas) {
@@ -320,6 +332,10 @@ public class WolThread extends Thread {
 			this.w_2 = width / 2;
 
 		}
+	}
+
+	public void setHolder(SurfaceHolder holder) {
+		this.holder = holder;
 	}
 
 }

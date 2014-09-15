@@ -26,20 +26,27 @@ public class WolGlRenderer implements Renderer {
 			1.0f, 0.0f		// bottom right	(V3)
 	};
 
+	/*
+	 * V2 V4 V6
+	 * V1 V3 V5
+	 */
+
 	private float[] vertices = {
-		-1.0f, -1.0f, 0.0f, // V1 - bottom left
-		-1.0f, 1.0f, 0.0f, // V2 - top left
-		1.0f, -1.0f, 0.0f, // V3 - bottom right
-		1.0f, 1.0f, 0.0f // V4 - top right
+		-1.0f, 0.0f, // V1 - bottom left
+		-1.0f, 1.0f, // V2 - top left
+		0.0f, 0.0f, // V3 - bottom middle
+		0.0f, 1.0f, // V4 - top middle
+		1.0f, 0.0f, // V5 bottom right
+		1.0f, 1.0f, // V6 top right
 	};
 
-	private int[] textures = new int[1];
+	private int[] textures = new int[2];
 
-	private Bitmap bitmap;
+	private Bitmap[] bitmaps;
 
-	public WolGlRenderer(Bitmap bitmap) {
+	public WolGlRenderer(Bitmap[] bitmaps) {
 		Log.i("wgl", "init");
-		this.bitmap = bitmap;
+		this.bitmaps = bitmaps;
 
 		// a float has 4 bytes so we allocate for each coordinate 4 bytes
 		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(vertices.length * 4);
@@ -54,27 +61,32 @@ public class WolGlRenderer implements Renderer {
 		// set the cursor position to the beginning of the buffer
 		vertexBuffer.position(0);
 
-		byteBuffer = ByteBuffer.allocateDirect(texture.length * 4);
+		byteBuffer = ByteBuffer.allocateDirect(texture.length * 4 * 2);
 		byteBuffer.order(ByteOrder.nativeOrder());
 		textureBuffer = byteBuffer.asFloatBuffer();
+		textureBuffer.put(texture);
 		textureBuffer.put(texture);
 		textureBuffer.position(0);
 	}
 
-	public void setBitmap(Bitmap bitmap) {
-		this.bitmap = bitmap;
+	public void setBitmap(Bitmap[] bitmaps) {
+		this.bitmaps = bitmaps;
 	}
 
 	public void loadGlTexture(GL10 gl) {
 		Log.i("wgl", "load");
-		gl.glGenTextures(1, textures, 0);
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
-		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+		gl.glGenTextures(textures.length, textures, 0);
+		for (int ti = 0 ; ti < textures.length ; ti++) {
+			gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[ti]);
+			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+			gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_CLAMP_TO_EDGE);
+			gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_CLAMP_TO_EDGE);
 
-		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+			GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmaps[ti], 0);
+			bitmaps[ti].recycle();
+		}
 
-		bitmap.recycle();
 	}
 
 	@Override
@@ -108,13 +120,18 @@ public class WolGlRenderer implements Renderer {
 		gl.glLoadIdentity(); 					//Reset The Modelview Matrix
 	}
 
+	float c_x = 0.0f;
+	float x_direction = 1.0f;
+	private static final float C_X_CHANGE = 0.05f;
+	private static final float MAX_X_ABS = 10f;
+
 	@Override
 	public void onDrawFrame(GL10 gl) {
-		if (bitmap != null) {
+		if (bitmaps != null) {
 
 			loadGlTexture(gl);
 
-			bitmap = null;
+			bitmaps = null;
 		}
 		// clear Screen and Depth Buffer
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
@@ -123,24 +140,32 @@ public class WolGlRenderer implements Renderer {
 		gl.glLoadIdentity();
 
 		// Drawing
-		gl.glTranslatef(0.0f, 0.0f, -2f);		// move 5 units INTO the screen
+		c_x += x_direction * C_X_CHANGE * (0.2f + MAX_X_ABS - Math.abs(c_x));
+		if (Math.abs(c_x) >= MAX_X_ABS) {
+			x_direction = -1f * Math.signum(c_x);
+		}
+		gl.glTranslatef(0.0f, 0.0f, -3f);		// move 5 units INTO the screen
 												// is the same as moving the camera 5 units away
+		gl.glRotatef(c_x, 0.0f, 0.0f, 1.0f);
 
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
+		for (int ti = 0 ; ti < textures.length ; ti++) {
+			gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[ti]);
 
-		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+			gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 
-//		gl.glColor4f(0.0f, 1.0f, 0.0f, 0.5f);
-		gl.glFrontFace(GL10.GL_CW);
+//			gl.glColor4f(0.0f, 1.0f, 0.0f, 0.5f);
+			gl.glFrontFace(GL10.GL_CW);
 
-		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexBuffer);
-		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer);
+			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vertexBuffer);
+			gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer);
 
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, vertices.length / 3);
+			gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, ti * 2, 4);
 
-		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+			gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+			gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+		}
+
 	}
 
 }
