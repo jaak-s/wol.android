@@ -23,21 +23,57 @@ public class WolGlRenderer implements Renderer {
 			0.0f, 1.0f,		// top left		(V2)
 			0.0f, 0.0f,		// bottom left	(V1)
 			1.0f, 1.0f,		// top right	(V4)
-			1.0f, 0.0f		// bottom right	(V3)
+			1.0f, 0.0f,		// bottom right	(V3)
+			1.0f, 0.0f,		// xxx
+			0.0f, 1.0f,		// xxx
+			0.0f, 1.0f,		// top left		(V2)
+			0.0f, 0.0f,		// bottom left	(V1)
+			1.0f, 1.0f,		// top right	(V4)
+			1.0f, 0.0f,		// bottom right	(V3)
+			1.0f, 0.0f,		// xxx
+			0.0f, 1.0f,		// xxx
+			0.0f, 1.0f,		// top left		(V2)
+			0.0f, 0.0f,		// bottom left	(V1)
+			1.0f, 1.0f,		// top right	(V4)
+			1.0f, 0.0f,		// bottom right	(V3)
+			1.0f, 0.0f,		// xxx
+			0.0f, 1.0f,		// xxx
+			0.0f, 1.0f,		// top left		(V2)
+			0.0f, 0.0f,		// bottom left	(V1)
+			1.0f, 1.0f,		// top right	(V4)
+			1.0f, 0.0f,		// bottom right	(V3)
 	};
 
 	/*
-	 * V2 V4 V6
-	 * V1 V3 V5
+	 * V2 V4 V6 V8
+	 * V1 V3 V5 V7
+	 * V10 V12 V14 V16
+	 * V9  V11 V13 V15
 	 */
 
 	private float[] vertices = {
-		-1.0f, 0.0f, // V1 - bottom left
-		-1.0f, 1.0f, // V2 - top left
-		0.0f, 0.0f, // V3 - bottom middle
-		0.0f, 1.0f, // V4 - top middle
-		1.0f, 0.0f, // V5 bottom right
-		1.0f, 1.0f, // V6 top right
+		-1.0f, 0.0f, // V1 - a bottom left
+		-1.0f, 1.0f, // V2 - a top left
+		0.0f, 0.0f, // V3 - a bottom right
+		0.0f, 1.0f, // V4 - a top right
+		0.0f, 1.0f, // dup
+		0.0f, 0.0f, // dup
+		0.0f, 0.0f, // V5 - b bottom right
+		0.0f, 1.0f, // V6 - b top right
+		1.0f, 0.0f, // V7 - b bottom left
+		1.0f, 1.0f, // V8 - b top left
+		1.0f, 1.0f, // dup
+		-1.0f, -1.0f, // dup
+		-1.0f, -1.0f, // V9 - a bottom left
+		-1.0f, 0.0f, // V10 - a top left
+		0.0f, -1.0f, // V11 - a bottom right
+		0.0f, 0.0f, // V12 - a top right
+		0.0f, 0.0f, // dup
+		0.0f, -1.0f, // dup
+		0.0f, -1.0f, // V13 - b bottom right
+		0.0f, 0.0f, // V14 - b top right
+		1.0f, -1.0f, // V15 - b bottom left
+		1.0f, 0.0f, // V16 - b top left
 	};
 
 	private int[] textures = new int[2];
@@ -61,10 +97,9 @@ public class WolGlRenderer implements Renderer {
 		// set the cursor position to the beginning of the buffer
 		vertexBuffer.position(0);
 
-		byteBuffer = ByteBuffer.allocateDirect(texture.length * 4 * 2);
+		byteBuffer = ByteBuffer.allocateDirect(texture.length * 4);
 		byteBuffer.order(ByteOrder.nativeOrder());
 		textureBuffer = byteBuffer.asFloatBuffer();
-		textureBuffer.put(texture);
 		textureBuffer.put(texture);
 		textureBuffer.position(0);
 	}
@@ -93,7 +128,7 @@ public class WolGlRenderer implements Renderer {
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		gl.glEnable(GL10.GL_TEXTURE_2D);			//Enable Texture Mapping ( NEW )
 		gl.glShadeModel(GL10.GL_SMOOTH); 			//Enable Smooth Shading
-		gl.glClearColor(0.0f, 0.0f, 0.0f, 0.5f); 	//Black Background
+		gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f); 	//Black Background
 		gl.glClearDepthf(1.0f); 					//Depth Buffer Setup
 		gl.glEnable(GL10.GL_DEPTH_TEST); 			//Enables Depth Testing
 		gl.glDepthFunc(GL10.GL_LEQUAL); 			//The Type Of Depth Testing To Do
@@ -122,8 +157,9 @@ public class WolGlRenderer implements Renderer {
 
 	float c_x = 0.0f;
 	float x_direction = 1.0f;
-	private static final float C_X_CHANGE = 0.05f;
-	private static final float MAX_X_ABS = 10f;
+	int count = 2;
+	private static final float C_X_CHANGE = 0.08f;
+	private static final float MAX_X_ABS = 200f;
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
@@ -143,8 +179,17 @@ public class WolGlRenderer implements Renderer {
 		c_x += x_direction * C_X_CHANGE * (0.2f + MAX_X_ABS - Math.abs(c_x));
 		if (Math.abs(c_x) >= MAX_X_ABS) {
 			x_direction = -1f * Math.signum(c_x);
+			count++;
+			if (count > vertices.length / 2) {
+				count = 2;
+			}
+			count = 20;
 		}
-		gl.glTranslatef(0.0f, 0.0f, -3f);		// move 5 units INTO the screen
+		// -10 ... 10 -> -0.3 ... -5
+		final float MIN_DEPTH = -0.8f;
+		final float MAX_DEPTH = -5.0f;
+		float depth = (c_x + MAX_X_ABS) / (MAX_X_ABS * 2) * (MAX_DEPTH - MIN_DEPTH) + MIN_DEPTH;
+		gl.glTranslatef(0.0f, -0.3f, depth);		// move 2 units INTO the screen
 												// is the same as moving the camera 5 units away
 		gl.glRotatef(c_x, 0.0f, 0.0f, 1.0f);
 
@@ -160,7 +205,7 @@ public class WolGlRenderer implements Renderer {
 			gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vertexBuffer);
 			gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer);
 
-			gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, ti * 2, 4);
+			gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, ti * 2, count);
 
 			gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 			gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);

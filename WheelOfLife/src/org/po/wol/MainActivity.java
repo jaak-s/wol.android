@@ -32,13 +32,13 @@ public class MainActivity extends Activity {
 
 		paint.setColor(Color.BLUE);
 		paint.setStrokeWidth(10);
-		canvas.drawLine(0, 0, 512, 512, paint);
+		canvas.drawLine(10, 10, 510, 510, paint);
 		paint.setColor(Color.RED);
-		canvas.drawLine(0, 512, 512, 0, paint);
+		canvas.drawLine(10, 510, 510, 10, paint);
+		paint.setColor(Color.GREEN);
+		canvas.drawRect(new Rect(0, 0, 10, 10), paint);
 
-		Bitmap bi2 = Bitmap.createBitmap(bi);
-
-		wgl = new WolGlRenderer(new Bitmap[]{bi, bi2});
+		wgl = new WolGlRenderer(new Bitmap[]{bi, Bitmap.createBitmap(bi), Bitmap.createBitmap(bi), Bitmap.createBitmap(bi)});
 		glSurfaceView.setRenderer(wgl);
 
 		set_dots();
@@ -51,15 +51,23 @@ public class MainActivity extends Activity {
 			int size = 3072;
 			Bitmap worldBm = dots_screen_view.getWorldAsBitmap(3072);
 
-			Bitmap ne = Bitmap.createBitmap(size / 2, size / 2, Bitmap.Config.ARGB_8888);
-			Canvas ne_c = new Canvas(ne);
-			ne_c.drawBitmap(worldBm, new Rect(size / 2, 0, size, size / 2), new Rect(0, 0, size / 2, size / 2), null);
-
 			Bitmap nw = Bitmap.createBitmap(size / 2, size / 2, Bitmap.Config.ARGB_8888);
 			Canvas nw_c = new Canvas(nw);
 			nw_c.drawBitmap(worldBm, new Rect(0, 0, size / 2, size / 2), new Rect(0, 0, size / 2, size / 2), null);
 
-			wgl.setBitmap( new Bitmap[]{nw, ne} );
+			Bitmap ne = Bitmap.createBitmap(size / 2, size / 2, Bitmap.Config.ARGB_8888);
+			Canvas ne_c = new Canvas(ne);
+			ne_c.drawBitmap(worldBm, new Rect(size / 2, 0, size, size / 2), new Rect(0, 0, size / 2, size / 2), null);
+
+			Bitmap sw = Bitmap.createBitmap(size / 2, size / 2, Bitmap.Config.ARGB_8888);
+			Canvas sw_c = new Canvas(sw);
+			sw_c.drawBitmap(worldBm, new Rect(0, size / 2, size / 2, size), new Rect(0, 0, size / 2, size / 2), null);
+
+			Bitmap se = Bitmap.createBitmap(size / 2, size / 2, Bitmap.Config.ARGB_8888);
+			Canvas se_c = new Canvas(se);
+			se_c.drawBitmap(worldBm, new Rect(size / 2, size / 2, size, size), new Rect(0, 0, size / 2, size / 2), null);
+
+			wgl.setBitmap( new Bitmap[]{nw, ne, sw, se} );
 		};}.start();
 	}
 
