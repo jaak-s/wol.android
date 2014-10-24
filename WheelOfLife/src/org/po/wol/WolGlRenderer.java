@@ -142,9 +142,8 @@ public class WolGlRenderer implements Renderer {
 
 	float c_x = 0.0f;
 	float x_direction = 1.0f;
-	int count = 2;
 	private static final float C_X_CHANGE = 0.08f;
-	private static final float MAX_X_ABS = 200f;
+	private static final float MAX_X_ABS = 300f;
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
@@ -164,15 +163,9 @@ public class WolGlRenderer implements Renderer {
 		c_x += x_direction * C_X_CHANGE * (0.2f + MAX_X_ABS - Math.abs(c_x));
 		if (Math.abs(c_x) >= MAX_X_ABS) {
 			x_direction = -1f * Math.signum(c_x);
-			count++;
-//			if (count > vertices.length / 2) {
-//				count = 2;
-//			}
-//			count = 8;
-			Log.i("count", "count=" + count);
 		}
 		// -10 ... 10 -> -0.3 ... -5
-		final float MIN_DEPTH = -0.4f;
+		final float MIN_DEPTH = -0.2f;
 		final float MAX_DEPTH = -5.0f;
 		float depth = (c_x + MAX_X_ABS) / (MAX_X_ABS * 2) * (MAX_DEPTH - MIN_DEPTH) + MIN_DEPTH;
 		gl.glTranslatef(0.0f, -0.3f, depth);		// move 2 units INTO the screen

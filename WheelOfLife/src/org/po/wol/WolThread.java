@@ -133,21 +133,24 @@ public class WolThread extends Thread {
 		}
 	}
 
-	private FixedBitmap paintWorldToImage() {
-		int size = 512;
-		Bitmap bm = getWorldAsBitmap( size );
-
-		return new FixedBitmap(0, size / 2, 0, bm, size, size);
-	}
-
 	public Bitmap getWorldAsBitmap(int size) {
 		Bitmap bm = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
 
 		Canvas canvas = new Canvas(bm);
 		Paint paint = new Paint();
-		paint.setColor(Color.CYAN);
 		paint.setStyle(Style.FILL);
-		canvas.drawRect(0, 0, size, size, paint);
+		int bi = 0;
+		int s_2 = size / 2;
+		for (int[] tl : new int[][]{
+				{s_2, s_2},
+				{s_2, 0},
+				{0, 0},
+				{0, s_2},
+		}) {
+			paint.setColor(backgrounds[bi]);
+			canvas.drawRect(tl[0], tl[1], tl[0] + s_2, tl[1] + s_2, paint);
+			bi++;
+		}
 
 		paintWorld(canvas, size, size, 0f, size / 2f, world.getLines());
 
