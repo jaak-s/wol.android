@@ -35,10 +35,11 @@ public class MainActivity extends Activity {
 		canvas.drawLine(10, 10, 510, 510, paint);
 		paint.setColor(Color.RED);
 		canvas.drawLine(10, 510, 510, 10, paint);
+		canvas.drawLine(20, 0, 20, 80, paint);
 		paint.setColor(Color.GREEN);
 		canvas.drawRect(new Rect(0, 0, 10, 10), paint);
 
-		wgl = new WolGlRenderer(new Bitmap[]{bi, Bitmap.createBitmap(bi), Bitmap.createBitmap(bi), Bitmap.createBitmap(bi)});
+		wgl = new WolGlRenderer(2, 2, new Bitmap[]{bi});
 		glSurfaceView.setRenderer(wgl);
 
 		set_dots();
@@ -47,7 +48,7 @@ public class MainActivity extends Activity {
 
 		new Thread(){@Override
 		public void run() {
-			try {sleep(4000);} catch (Exception e) {}
+			try {sleep(1000);} catch (Exception e) {}
 			int size = 3072;
 			Bitmap worldBm = dots_screen_view.getWorldAsBitmap(3072);
 
